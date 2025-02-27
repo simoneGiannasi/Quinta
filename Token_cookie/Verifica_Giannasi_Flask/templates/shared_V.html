@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Condivisa</title>
+</head>
+<body>
+    <h2>Accesso alla risorsa</h2>
+    {% if url %}
+        <p>Il link condiviso è: <a href="{{ url }}" target="_blank">{{ url }}</a></p>
+    {% else %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>

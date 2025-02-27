@@ -1,0 +1,24 @@
+Sono ambienti virtuali per lavorare.
+
+Quando mando il codice mando anche l'environment.
+
+E' usato quando lavoro in più persone sullo stesso progetto, perché si possono installare le dipendenze in modo separato per ogni progetto. 
+Questo permette di non avere problemi di dipendenze in conflitto tra i progetti.
+
+
+Anche usato quando lavoro su più progetti contemporaneamente perchè tengo le versioni dipendenze uguali per tutti i progetti, rendendoli compatibili.
+
+
+Se faccio pip list nel mio ambiente virtuale, posso vedere tutte le dipendenze installate.
+Se lo faccio fuori dal mio ambiente virtuale, non posso vedere le dipendenze installate, vedo solo pip.
+
+
+
+
+1. Apro una cartella
+2. Apro il cmd
+3. Digito `python -m venv venv` per creare un nuovo ambiente virtuale
+4. Digito `venv\Scripts\activate` per attivare l'ambiente virtuale
+5. Se non funziona perchè: L'esecuzione di script è disabilitata nel sistema in uso. set-executionpolicy remotesigned
+
+poi faccio "pip install requirements.txt" per installare le dipendenze

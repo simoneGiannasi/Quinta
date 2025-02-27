@@ -1,0 +1,39 @@
+I cookie si salvono anche sul server, i token solo sul client. Per sapere che il token sia mio uso una chiave segrteta per criptare e decriptare il token. 
+In questo modo, se qualcuno riesce a rubare il token, non potrà utilizzarlo perché non conosce la chiave di decriptazione.
+I token sono in chiaro, non sono criptati, quindi se qualcuno si impossessa del token di qualcuno quando è ancora valido, questo potrò fare l'accesso come la
+persona a cui il token è assegnato.
+
+
+Uso libreria "jwt" per la creazione e verifica dei token.
+
+
+I token sono spesso usati in siti single page. E' utile avere il token nell'header perchè non si ricarica/cambia ma è fisso.
+Visto che ho due pagine devo passare il token tra le pagine:
+-nell'url: mai farlo per motivo di sicurezza
+-nell'header: perchè è più semplice e non necessita di recaricare la pagina
+-con i cookie: perchè i coockie non accettano esterni ma solo i propri token
+
+token = jwt.encode(
+    {"username": user_id},
+    SECRET_KEY,
+    algorithm="HS256"
+)
+
+
+Differenze principali
+Gestione del lato server:
+
+I token possono essere stateless (contenere tutte le informazioni nel token stesso).
+I cookie possono dipendere dal mantenimento dello stato della sessione sul server.
+Trasferimento:
+
+I token sono spesso inviati manualmente tramite l'header Authorization.
+I cookie vengono inviati automaticamente dal browser in ogni richiesta.
+Memorizzazione:
+
+I token possono essere memorizzati nel localStorage, sessionStorage o cookie.
+I cookie sono gestiti direttamente dal browser.
+Sicurezza:
+
+I token sono più flessibili per app SPA (Single Page Applications) e REST API.
+I cookie sono più esposti a rischi di Cross-Site Scripting (XSS) e Cross-Site Request Forgery (CSRF), a meno che non siano configurati correttamente (HttpOnly, SameSite).

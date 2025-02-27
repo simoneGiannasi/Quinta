@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genera Link Temporaneo</title>
+</head>
+<body>
+    <h2>Genera un link temporaneo</h2>
+    <form action="/" method="POST">
+        <label for="url">URL da condividere:</label>
+        <input type="text" name="url" required> <!-- campo "url" da prendere in post -->
+        <label for="expiration">Scadenza (minuti):</label> <!-- campo "expiration" da prendere in post -->
+        <input type="number" name="expiration" value="10" min="1">
+        <button type="submit">Genera Link</button>
+    </form>
+
+    {% if link %}
+        <p>Link generato: <a href="{{ link }}" >{{ link }}</a></p>
+    {% endif %}
+</body>
+</html>
