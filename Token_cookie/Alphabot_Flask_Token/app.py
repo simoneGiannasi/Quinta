@@ -1,16 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
+import RPi.GPIO as GPIO
+from alphaLib import AlphaBot  # Assicurati che questo file sia nella stessa directory
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a random secret key
+app.config['SECRET_KEY'] = 'your_secret_key'  # Cambia questo con una chiave segreta casuale
+bot = AlphaBot()  # Crea un'istanza dell'AlphaBot
 
 def generate_token(username):
     payload = {
         'username': username,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # Token expires in 1 day
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # Token scade in 1 giorno
     }
     return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
@@ -43,15 +46,15 @@ def validate(username, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     psw = c.execute('SELECT psw FROM users WHERE username = ?', (username,)).fetchone()
-    if psw:
-        print(f"Stored hashed password: {psw[0]}")
+    conn.close()
+    
     if psw and check_password_hash(psw[0], password):
         token = generate_token(username)
         response = make_response(redirect(url_for('home')))
-        response.set_cookie('token', token, max_age=60*60*24)
+        response.set_cookie('token', token, max_age=60*60*24, httponly=True)
         return response
     else:
-        alert = "Invalid credential!"
+        alert = "Credenziali non valide!"
         return render_template('login.html', alert=alert)
 
 @app.route('/create_account', methods=['GET', 'POST'])
@@ -60,10 +63,15 @@ def create_account():
         username = request.form['e-mail']
         password = request.form['password']
         hashed_password = generate_password_hash(password)
-        print(f"Hashed password: {hashed_password}")
-
+        
         conn = sqlite3.connect('users.db')
         c = conn.cursor()
+        # Controlla se l'utente esiste già
+        existing_user = c.execute('SELECT username FROM users WHERE username = ?', (username,)).fetchone()
+        if existing_user:
+            conn.close()
+            return render_template('create_account.html', alert="Utente già esistente!")
+        
         c.execute('INSERT INTO users (username, psw) VALUES (?, ?)', (username, hashed_password))
         conn.commit()
         conn.close()
@@ -77,5 +85,60 @@ def logout():
     response.delete_cookie('token')
     return response
 
+# Nuova rotta per gestire i comandi dell'AlphaBot
+@app.route('/comando', methods=['POST'])
+def comando():
+    # Verifica l'autenticazione
+    token = request.cookies.get('token')
+    username = verify_token(token)
+    if not username:
+        return jsonify({'status': 'Non autorizzato'}), 401
+    
+    try:
+        data = request.get_json()
+        action = data.get('action')
+        
+        if action == 'avanti':
+            bot.forward()
+            response = {'status': 'Il robot si muove in avanti'}
+        elif action == 'indietro':
+            bot.backward()
+            response = {'status': 'Il robot si muove indietro'}
+        elif action == 'sinistra':
+            bot.left()
+            response = {'status': 'Il robot gira a sinistra'}
+        elif action == 'destra':
+            bot.right()
+            response = {'status': 'Il robot gira a destra'}
+        elif action == 'stop':
+            bot.stop()
+            response = {'status': 'Il robot si è fermato'}
+        else:
+            return jsonify({'status': 'Comando non riconosciuto'}), 400
+            
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({'status': f'Errore: {str(e)}'}), 500
+
+@app.teardown_appcontext
+def cleanup(exception=None):
+    # Pulisce i pin GPIO quando l'applicazione si chiude
+    GPIO.cleanup()
+
+# Inizializza il database se non esiste
+def init_db():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        psw TEXT NOT NULL
+    )
+    ''')
+    conn.commit()
+    conn.close()
+
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, host='0.0.0.0', port=4444)
