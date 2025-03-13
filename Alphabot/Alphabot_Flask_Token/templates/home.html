@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlphaBot Controller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .controller {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 10px;
+        }
+        button {
+            width: 100%;
+            height: 100%;
+            font-size: 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #stop {
+            background-color: #e74c3c;
+            grid-column: 2;
+            grid-row: 2;
+        }
+        #stop:hover {
+            background-color: #c0392b;
+        }
+        #up {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        #left {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        #right {
+            grid-column: 3;
+            grid-row: 2;
+        }
+        #down {
+            grid-column: 2;
+            grid-row: 3;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .logout-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-info">
+        <span>Benvenuto, {{ username }}!</span>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+    
+    <h1>AlphaBot Controller</h1>
+    <div class="controller">
+        <button id="up">↑</button>
+        <button id="left">←</button>
+        <button id="stop">■</button>
+        <button id="right">→</button>
+        <button id="down">↓</button>
+    </div>
+    <div class="status" id="status">Stato: Pronto</div>
+
+    <script>
+        // Elementi del DOM
+        const upButton = document.getElementById('up');
+        const leftButton = document.getElementById('left');
+        const stopButton = document.getElementById('stop');
+        const rightButton = document.getElementById('right');
+        const downButton = document.getElementById('down');
+        const statusElement = document.getElementById('status');
+
+        // Funzione per inviare i comandi
+        function sendCommand(command) {
+            statusElement.textContent = `Stato: Comando in invio - ${command}`;
+            
+            // Invia una richiesta AJAX al server Flask
+            fetch('/comando', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: command }),  //Dal python devo prendere il dato "action"
+            })
+            .then(response => {
+                if (response.status === 401) {    //Nell app.py mando 401 quando la sessione è scaduta oppure non ho inserito le credenziali
+                    window.location.href = '/login';
+                    throw new Error('Sessione scaduta. Effettua nuovamente il login.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                statusElement.textContent = `Stato: ${data.status}`;
+            })
+            .catch(error => {
+                statusElement.textContent = `Stato: Errore - ${error.message}`;
+            });
+        }
+
+        // Aggiunta degli event listener per mouse e touch
+        function setupButton(button, command) {
+            // Per mouse
+            button.addEventListener('mousedown', () => sendCommand(command)); //Quando clicco mando il comando
+            button.addEventListener('mouseup', () => sendCommand('stop'));  //Quando rilascio mando lo stop
+            button.addEventListener('mouseleave', () => sendCommand('stop')); 
+            
+            // Per touch
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Previene il comportamento di default
+                sendCommand(command);
+            });
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault(); // Previene il comportamento di default
+                sendCommand('stop');
+            });
+        }
+
+            // Configura i pulsanti direzionali
+            setupButton(upButton, 'avanti');
+            setupButton(leftButton, 'sinistra');
+            setupButton(rightButton, 'destra');
+            setupButton(downButton, 'indietro');
+
+            stopButton.addEventListener('click', () => sendCommand('stop'));  // Il pulsante stop mantiene il comportamento originale
+
+    </script>
+</body>
+</html>
