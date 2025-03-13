@@ -1,0 +1,59 @@
+AlphaBot Controller è un'applicazione web basata su Flask progettata per controllare un robot AlphaBot tramite un'interfaccia web intuitiva. L'applicazione include l'autenticazione degli utenti e la gestione delle sessioni tramite token JWT.
+
+Caratteristiche
+Registrazione e autenticazione utenti: Gli utenti possono creare account e accedere in modo sicuro.
+Gestione delle sessioni con JWT: L'autenticazione è gestita tramite JSON Web Tokens.
+Controllo dell'AlphaBot via web: Gli utenti possono controllare i movimenti dell'AlphaBot attraverso un'interfaccia web.
+Comandi di movimento base:
+Avanti
+Indietro
+Sinistra
+Destra
+Stop
+Database per la gestione utenti: Un database SQLite (users.db) viene utilizzato per memorizzare le informazioni degli utenti.
+Struttura del progetto
+AlphaBot-Controller/
+├── app.py                # Applicazione principale
+├── crea_dB.py            # Script di inizializzazione del database
+├── alphaLib.py           # Libreria di controllo dell'AlphaBot
+├── users.db              # Database SQLite per l'autenticazione utenti
+├── static/
+│   └── style.css         # Foglio di stile per l'interfaccia web
+├── templates/            # Template HTML
+│   ├── create_account.html  # Pagina di registrazione utenti
+│   ├── home.html            # Pagina principale di controllo
+│   └── login.html           # Pagina di accesso
+Gestione delle sessioni
+L'applicazione utilizza token JWT per la gestione delle sessioni, garantendo un'autenticazione sicura e persistente degli utenti.
+
+Installazione
+Clonare il repository:
+
+git clone https://github.com/tuo-utente/AlphaBot-Controller.git
+cd AlphaBot-Controller
+Creare ed attivare un ambiente virtuale:
+
+python -m venv venv
+source venv/bin/activate  # Su Windows: venv\Scripts\activate
+Installare le dipendenze:
+
+pip install -r requirements.txt
+Inizializzare il database:
+
+python crea_dB.py
+Avviare l'applicazione:
+
+python app.py
+Accedere all'interfaccia web: Aprire un browser e andare su http://127.0.0.1:5000
+
+Tecnologie utilizzate
+Python 3
+Flask
+SQLite
+JWT (JSON Web Token)
+HTML/CSS (Bootstrap opzionale)
+Autori
+Progetto sviluppato da Nicolò e Simone.
+
+Licenza
+Questo progetto è distribuito sotto licenza MIT. Vedi LICENSE per maggiori dettagli.
