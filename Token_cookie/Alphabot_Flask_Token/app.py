@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 import RPi.GPIO as GPIO
-from alphaLib import AlphaBot  # Assicurati che questo file sia nella stessa directory
+from alphaLib import AlphaBot  
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Cambia questo con una chiave segreta casuale
@@ -95,6 +95,13 @@ def comando():
         return jsonify({'status': 'Non autorizzato'}), 401
     
     try:
+        # Imposta il modo GPIO qui per assicurarsi che sia correttamente configurato prima di ogni comando
+        try:
+            GPIO.setmode(GPIO.BCM)
+        except RuntimeError:
+            # Se il modo è già impostato, possiamo continuare
+            pass
+        
         data = request.get_json()
         action = data.get('action')
         
@@ -120,12 +127,7 @@ def comando():
     except Exception as e:
         return jsonify({'status': f'Errore: {str(e)}'}), 500
 
-@app.teardown_appcontext
-def cleanup(exception=None):
-    # Pulisce i pin GPIO quando l'applicazione si chiude
-    GPIO.cleanup()
 
-# Inizializza il database se non esiste
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -140,5 +142,8 @@ def init_db():
     conn.close()
 
 if __name__ == '__main__':
-    init_db()
-    app.run(debug=True, host='0.0.0.0', port=4444)
+    try:
+        init_db()
+        app.run(debug=True, host='0.0.0.0', port=4444)
+    finally:
+        GPIO.cleanup()  # Only clean up when the app completely exits

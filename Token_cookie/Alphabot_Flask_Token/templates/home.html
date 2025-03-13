@@ -128,10 +128,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: command }),
+                body: JSON.stringify({ action: command }),  //Dal python devo prendere il dato "action"
             })
             .then(response => {
-                if (response.status === 401) {
+                if (response.status === 401) {    //Nell app.py mando 401 quando la sessione è scaduta oppure non ho inserito le credenziali
                     window.location.href = '/login';
                     throw new Error('Sessione scaduta. Effettua nuovamente il login.');
                 }
@@ -145,12 +145,32 @@
             });
         }
 
-        // Aggiunta degli event listener ai pulsanti
-        upButton.addEventListener('click', () => sendCommand('avanti'));
-        leftButton.addEventListener('click', () => sendCommand('sinistra'));
-        stopButton.addEventListener('click', () => sendCommand('stop'));
-        rightButton.addEventListener('click', () => sendCommand('destra'));
-        downButton.addEventListener('click', () => sendCommand('indietro'));
+        // Aggiunta degli event listener per mouse e touch
+        function setupButton(button, command) {
+            // Per mouse
+            button.addEventListener('mousedown', () => sendCommand(command)); //Quando clicco mando il comando
+            button.addEventListener('mouseup', () => sendCommand('stop'));  //Quando rilascio mando lo stop
+            button.addEventListener('mouseleave', () => sendCommand('stop')); 
+            
+            // Per touch
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Previene il comportamento di default
+                sendCommand(command);
+            });
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault(); // Previene il comportamento di default
+                sendCommand('stop');
+            });
+        }
+
+            // Configura i pulsanti direzionali
+            setupButton(upButton, 'avanti');
+            setupButton(leftButton, 'sinistra');
+            setupButton(rightButton, 'destra');
+            setupButton(downButton, 'indietro');
+
+            stopButton.addEventListener('click', () => sendCommand('stop'));  // Il pulsante stop mantiene il comportamento originale
+
     </script>
 </body>
 </html>
