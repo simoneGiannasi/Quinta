@@ -29,7 +29,7 @@ L'applicazione utilizza token JWT per la gestione delle sessioni, garantendo un'
 Installazione
 Clonare il repository:
 
-git clone https://github.com/tuo-utente/AlphaBot-Controller.git
+git clone https://github.com/simoneGiannasi/Quinta/Alphabot.git
 cd AlphaBot-Controller
 Creare ed attivare un ambiente virtuale:
 
@@ -44,7 +44,7 @@ python crea_dB.py
 Avviare l'applicazione:
 
 python app.py
-Accedere all'interfaccia web: Aprire un browser e andare su http://127.0.0.1:5000
+Accedere all'interfaccia web: Aprire un browser e andare su http://192.168.1.133:4444
 
 Tecnologie utilizzate
 Python 3
@@ -54,6 +54,3 @@ JWT (JSON Web Token)
 HTML/CSS (Bootstrap opzionale)
 Autori
 Progetto sviluppato da Nicolò e Simone.
-
-Licenza
-Questo progetto è distribuito sotto licenza MIT. Vedi LICENSE per maggiori dettagli.
