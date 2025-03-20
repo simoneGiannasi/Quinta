@@ -7,9 +7,10 @@ import RPi.GPIO as GPIO
 from alphaLib import AlphaBot  
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'  # Cambia questo con una chiave segreta casuale
+app.config['SECRET_KEY'] = 'Nick_Jane'  
 bot = AlphaBot()  # Crea un'istanza dell'AlphaBot
 
+#Funzione che genera il token con lo username e la data di scadenza
 def generate_token(username):
     payload = {
         'username': username,
@@ -17,6 +18,8 @@ def generate_token(username):
     }
     return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
+
+#Funzione che verifica il token e restituisce l'username se valido, altrimenti None
 def verify_token(token):
     try:
         payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -26,6 +29,8 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return None
 
+
+#Route per la home page, controlla se l'utente è loggato con il token valido
 @app.route('/', methods=['GET'])
 def home():
     token = request.cookies.get('token')
@@ -34,6 +39,8 @@ def home():
         return redirect(url_for('login'))
     return render_template('home.html', username=username)
 
+
+#Route per la pagina di login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -42,6 +49,7 @@ def login():
         return validate(username, password)
     return render_template('login.html')
 
+#Funzione che controlla username e password dal db 
 def validate(username, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -57,6 +65,8 @@ def validate(username, password):
         alert = "Credenziali non valide!"
         return render_template('login.html', alert=alert)
 
+
+# Route per la pagina di creazione di un account
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
@@ -79,13 +89,15 @@ def create_account():
     
     return render_template('create_account.html')
 
+
+# Route per la pagina di logout
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     response = make_response(redirect(url_for('login')))
     response.delete_cookie('token')
     return response
 
-# Nuova rotta per gestire i comandi dell'AlphaBot
+#Nuova rotta per gestire i comandi dell'AlphaBot
 @app.route('/comando', methods=['POST'])
 def comando():
     # Verifica l'autenticazione
