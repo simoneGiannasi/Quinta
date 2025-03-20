@@ -9,9 +9,8 @@ def main():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
-        psw TEXT NOT NULL
+        psw TEXT NOT NULL)'''
     );
-    INSERT INTO users (username, psw) VALUES (simone.giannasi@itiscuneo.eu, ?)''', (password,))
     conn.commit()
     conn.close()
 
