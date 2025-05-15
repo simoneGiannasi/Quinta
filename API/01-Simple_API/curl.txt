@@ -1,0 +1,14 @@
+CREATE
+curl -X POST http://127.0.0.1:5000/studenti -H "Content-Type: application/json" -d "{\"nome\": \"Anna\", \"cognome\": \"Neri\", \"eta\": 20}"
+
+
+READ
+curl -X GET http://127.0.0.1:5000/studenti
+
+
+READ - Ottenere un singolo studente per ID
+curl -X GET http://127.0.0.1:5000/studenti/1
+
+UPDATE
+curl -X PUT http://127.0.0.1:5000/studenti/1 -H "Content-Type: application/json" -d "{\"eta\": 21}"
+

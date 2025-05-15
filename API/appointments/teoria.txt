@@ -1,0 +1,60 @@
+In Flask puro, usi jsonify() per restituire una risposta JSON formattata correttamente,
+    con intestazioni HTTP (header Content-Type: application/json) e serializzazione.
+    In Flask-RESTful, questa parte è già automatizzata dal framework.
+   
+    Quando tu ritorni un dizionario Python, ci pensa lui a:
+    convertirlo in JSON con json.dumps(...)
+    impostare l'header Content-Type: application/json
+    creare l’oggetto Response
+"""
+"""
+    POST → Crea una nuova risorsa
+        Usi POST quando inserisci un nuovo studente.
+        Non conosci a priori l’ID (viene generato dal server).
+        È non idempotente: se invii due volte lo stesso POST, crea due risorse.
+"""
+
+"""
+    PUT → Aggiorna (o crea) una risorsa specifica
+        Usi PUT quando modifichi uno studente con ID noto.
+        Il client fornisce l'id nella URL.
+        È idempotente: inviare più volte lo stesso PUT dà lo stesso risultato.
+"""
+
+"""
+    PATCH → Modifica parziale di una risorsa
+        Usi PATCH quando vuoi aggiornare solo alcuni campi di uno studente.
+        È idempotente: inviare più volte la stessa richiesta PATCH produce lo stesso risultato.
+"""
+
+"""
+    GET → Legge le informazioni
+        Cosa fa   Recupera dati dal server (senza modificarli)
+        Quando usarlo   Per leggere una o più risorse
+        È sicuro
+        È idempotente (chiamate ripetute non cambiano niente)
+"""
+
+"""
+    DELETE → Cancella una risorsa
+        Cosa fa   Rimuove una risorsa dal server
+        Quando usarlo   Per cancellare una risorsa con ID noto
+        Non è sicuro
+        È idempotente (una volta cancellata, le richieste successive non cambiano nulla)
+"""
+
+"""
+    HEAD → Come GET ma senza corpo
+        Cosa fa   Verifica se la risorsa esiste, senza restituire il contenuto
+        Quando usarlo   Per controlli leggeri sull'esistenza di una risorsa
+        È sicuro
+        È idempotente
+"""
+
+"""
+    OPTIONS → Scopri quali metodi sono disponibili
+        Cosa fa   Restituisce l'elenco dei metodi supportati dall'endpoint
+        Quando usarlo   Per capire come interagire con una risorsa (utile per CORS)
+        È sicuro
+        È idempotente
+"""
